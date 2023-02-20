@@ -1,0 +1,43 @@
+function onEdit(e) {
+
+// シート情報定義
+var ss = SpreadsheetApp.getActiveSpreadsheet();
+var sheet = ss.getActiveSheet();
+var range = sheet.getActiveRange();
+var row = e.range.getRow();
+var column = e.range.getColumn();
+
+  // 有給管理表の年入力でシート名を一括変更する
+  if (sheet.getName() == "有給管理表" && row == 2 && column == 2) { 
+    // 有給管理表の年を取得する
+    var targetYear = ss.getSheetByName("有給管理表").getRange(2,2).getValue();
+    var targetNextYear = targetYear+1;
+    var targetYear = String(targetYear);
+    var targetNextYear = String(targetNextYear);
+
+    // すべてのシート名を取得
+    const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+
+    // シート名に有給管理表の値を反映する
+    sheets.forEach(function(sheet){
+      var sheetName = sheet.getName();
+      // シート名が全て数字
+      if( sheetName.match(/^[0-9]+$/) ) {
+        // 月の取得
+        let month = sheetName.slice( -2 ) ;
+        // 月が01, 02, 03は年に1を足して置換
+        if (month.match(/[0][1-6]$/)) {
+              // シート名変更
+              sheet.setName(targetNextYear + month);
+              // シート内セル値（年）の変更
+              sheet.getRange('G1').setValue(targetNextYear);
+        } else {
+          // シート名変更
+          sheet.setName(targetYear + month);
+          // シート内セル値（年）の変更
+          sheet.getRange('G1').setValue(targetYear);
+        }
+      } 
+    })
+  }
+}
